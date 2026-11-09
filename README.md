@@ -852,3 +852,4 @@ Made for PayPal AI Hackathon 2026
 **AI assistance:** Most of the code in this project was written with AI assistance:
 
 * **Big Pickle** (OpenCode) wrote most of the application code, tests and documentation, including the FastAPI service, mandate engine, planner, verifier, mock PayPal adapter, hash-chained audit log, browser UI, deployment files and this README.
+* The team defined the project goals, directed the design, tested the system, and integrated and debugged.
