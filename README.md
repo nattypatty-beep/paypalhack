@@ -1,7 +1,6 @@
 # MandatePay
 
 **Agentic commerce with a leash.**
-*Demo Here -> https://mandatepay-byfz.onrender.com/*
 
 [![CI](https://github.com/nattypatty-beep/paypalhack/actions/workflows/ci.yml/badge.svg)](https://github.com/nattypatty-beep/paypalhack/actions/workflows/ci.yml)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB)
