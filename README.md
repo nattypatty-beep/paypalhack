@@ -63,6 +63,7 @@ Built for the **PayPal AI Hackathon 2026**.
 - [Safety and limitations](#safety-and-limitations)
 - [Documentation](#documentation)
 - [License](#license)
+- [Credits](#credits)
 
 ---
 
@@ -850,4 +851,4 @@ Made for PayPal AI Hackathon 2026
 
 **AI assistance:** Most of the code in this project was written with AI assistance:
 
-* **model** 
+* **Big Pickle** (OpenCode) wrote most of the application code, tests and documentation, including the FastAPI service, mandate engine, planner, verifier, mock PayPal adapter, hash-chained audit log, browser UI, deployment files and this README.
