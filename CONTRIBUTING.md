@@ -57,7 +57,7 @@ app/config.py      Environment-driven settings
 app/static/        Vanilla UI, styles, app.js, vendored AG Grid
 samples/           Demo deliverables engineered to pass or fail
 tests/             pytest suite
-docs/              Architecture, PayPal, demo script, Devpost copy
+docs/              Architecture, PayPal, deployment, security
 scripts/smoke.py   Smoke test for a running server
 ```
 

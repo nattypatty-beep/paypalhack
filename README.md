@@ -131,7 +131,7 @@ credits tomorrow.
 | Offline mode | Mock PayPal + deterministic rules engines; no network required |
 | Public demo | Dockerfile, Render blueprint and optional HTTP Basic auth |
 | Tests | 53 pytest tests covering rules, planner, verifier, API flow, auth and tamper detection |
-| Docs | Architecture, PayPal setup, deployment, timed demo script, Devpost copy, security policy |
+| Docs | Architecture, PayPal setup, deployment, security policy |
 
 ### What is mocked vs real
 
@@ -556,8 +556,7 @@ The bottom panel runs eight stages against the public API:
 | 8. Verify the hash chain | Recomputes every audit link | 23 rows, zero breaks |
 
 You can also click **Step** to run one stage at a time, or **Reset** for a fresh
-mandate and hash chain. The full run takes about two minutes. A timed recording
-script is in [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md).
+mandate and hash chain. The full run takes about two minutes.
 
 ---
 
@@ -611,7 +610,7 @@ app/
   static/        Vanilla UI, styles, app.js, vendored AG Grid
 samples/         Demo deliverables engineered to pass or fail
 tests/           53-test pytest suite
-docs/            Architecture, PayPal, deployment, demo script, Devpost copy, screenshot
+docs/            Architecture, PayPal, deployment, security
 scripts/         Smoke test
 Dockerfile       Non-root production image with a /data volume
 render.yaml      Render blueprint: demo mode, forced mock PayPal, public demo
@@ -793,8 +792,6 @@ designed to show the gap rather than hide it.
 - **Grand Prize** — working software, honest mock fallbacks, tests, docs and a
   sub-three-minute scripted demo.
 
-The full submission copy is in [docs/DEVPOST.md](docs/DEVPOST.md).
-
 ---
 
 ## Safety and limitations
@@ -831,10 +828,6 @@ and safe-deployment checklist.
   storage, Basic auth, webhooks, SSE and a public-demo security checklist.
 - [PayPal integration](docs/PAYPAL.md) — sandbox setup, exact API calls,
   idempotency, webhooks, live guardrails, troubleshooting.
-- [Demo script](docs/DEMO_SCRIPT.md) — timed shot list for a sub-three-minute
-  video, narration and fallback steps.
-- [Devpost submission copy](docs/DEVPOST.md) — ready-to-paste project story,
-  built-with list and track fit.
 - [Contributing](CONTRIBUTING.md) — setup, code invariants, tests, PR checklist.
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Security](SECURITY.md)
