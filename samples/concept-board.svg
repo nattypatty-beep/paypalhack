@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="700" viewBox="0 0 1000 700" role="img" aria-labelledby="cbTitle cbDesc">
+  <title id="cbTitle">Hearth &amp; Crumb — three concept directions</title>
+  <desc id="cbDesc">A concept board with three logo directions, colour studies and short rationale for a neighbourhood bakery.</desc>
+
+  <rect x="0" y="0" width="1000" height="700" fill="#F7F1E6"/>
+
+  <text x="64" y="92" font-family="Georgia, serif" font-size="38" fill="#2B1B12">Three directions for Hearth &amp; Crumb</text>
+  <text x="64" y="126" font-family="Verdana, sans-serif" font-size="15" letter-spacing="4" fill="#C96F4A">CONCEPT BOARD / 01</text>
+
+  <!-- direction 1 -->
+  <rect x="64" y="168" width="272" height="380" rx="18" fill="#FFFFFF"/>
+  <circle cx="200" cy="286" r="62" fill="#E8B04B"/>
+  <path d="M166 286c8-26 22-40 34-40s26 14 34 40c2 10-4 18-14 18h-40c-10 0-16-8-14-18z" fill="#F7F1E6" stroke="#2B1B12" stroke-width="5"/>
+  <text x="88" y="408" font-family="Verdana, sans-serif" font-size="14" letter-spacing="3" fill="#C96F4A">DIRECTION 01</text>
+  <text x="88" y="442" font-family="Georgia, serif" font-size="28" fill="#2B1B12">The Hearth</text>
+  <text x="88" y="474" font-family="Verdana, sans-serif" font-size="14" fill="#2B1B12">A warm disc with a loaf at the</text>
+  <text x="88" y="496" font-family="Verdana, sans-serif" font-size="14" fill="#2B1B12">centre. Reads as a seal on</text>
+  <text x="88" y="518" font-family="Verdana, sans-serif" font-size="14" fill="#2B1B12">packaging and signage.</text>
+
+  <!-- direction 2 -->
+  <rect x="364" y="168" width="272" height="380" rx="18" fill="#FFFFFF"/>
+  <path d="M430 300c12-46 38-70 68-70s56 24 68 70c4 18-8 32-25 32h-86c-17 0-29-14-25-32z" fill="#E8B04B" stroke="#2B1B12" stroke-width="6"/>
+  <path d="M470 268c8 18 8 40 0 60M500 258c8 22 8 50 0 72M530 268c8 18 8 40 0 60" fill="none" stroke="#2B1B12" stroke-width="5" stroke-linecap="round"/>
+  <text x="388" y="408" font-family="Verdana, sans-serif" font-size="14" letter-spacing="3" fill="#C96F4A">DIRECTION 02</text>
+  <text x="388" y="442" font-family="Georgia, serif" font-size="28" fill="#2B1B12">The Loaf</text>
+  <text x="388" y="474" font-family="Verdana, sans-serif" font-size="14" fill="#2B1B12">Three strokes become a loaf.</text>
+  <text x="388" y="496" font-family="Verdana, sans-serif" font-size="14" fill="#2B1B12">Simple, ownable and clear at</text>
+  <text x="388" y="518" font-family="Verdana, sans-serif" font-size="14" fill="#2B1B12">small avatar sizes.</text>
+
+  <!-- direction 3 -->
+  <rect x="664" y="168" width="272" height="380" rx="18" fill="#FFFFFF"/>
+  <circle cx="800" cy="286" r="70" fill="#7B8B6F"/>
+  <path d="M766 286l22 22 44-52" fill="none" stroke="#F7F1E6" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="688" y="408" font-family="Verdana, sans-serif" font-size="14" letter-spacing="3" fill="#C96F4A">DIRECTION 03</text>
+  <text x="688" y="442" font-family="Georgia, serif" font-size="28" fill="#2B1B12">The Seal</text>
+  <text x="688" y="474" font-family="Verdana, sans-serif" font-size="14" fill="#2B1B12">A stamp of approval in sage.</text>
+  <text x="688" y="496" font-family="Verdana, sans-serif" font-size="14" fill="#2B1B12">Feels local, honest and a</text>
+  <text x="688" y="518" font-family="Verdana, sans-serif" font-size="14" fill="#2B1B12">little more premium.</text>
+
+  <!-- palette + rationale -->
+  <text x="64" y="606" font-family="Verdana, sans-serif" font-size="14" letter-spacing="3" fill="#C96F4A">PALETTE</text>
+  <rect x="64" y="622" width="64" height="32" fill="#2B1B12"/>
+  <rect x="136" y="622" width="64" height="32" fill="#E8B04B"/>
+  <rect x="208" y="622" width="64" height="32" fill="#C96F4A"/>
+  <rect x="280" y="622" width="64" height="32" fill="#7B8B6F"/>
+  <rect x="352" y="622" width="64" height="32" fill="#F7F1E6" stroke="#2B1B12" stroke-width="2"/>
+
+  <text x="484" y="606" font-family="Verdana, sans-serif" font-size="14" letter-spacing="3" fill="#C96F4A">RATIONALE</text>
+  <text x="484" y="632" font-family="Verdana, sans-serif" font-size="14" fill="#2B1B12">Direction 02 is the strongest: it keeps the craft of a</text>
+  <text x="484" y="654" font-family="Verdana, sans-serif" font-size="14" fill="#2B1B12">hand-made loaf, scales cleanly, and gives the wordmark</text>
+  <text x="484" y="676" font-family="Verdana, sans-serif" font-size="14" fill="#2B1B12">room to breathe. Palette: espresso, crust, terracotta, sage.</text>
+</svg>

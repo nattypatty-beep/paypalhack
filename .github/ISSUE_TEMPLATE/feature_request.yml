@@ -1,0 +1,45 @@
+name: Feature request
+description: Suggest an improvement or a new safety capability.
+title: "[idea] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the agentic-commerce or safety gap, not just the UI change.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - mandate engine / approvals
+        - verification / inspection
+        - PayPal / payouts
+        - audit / AG Grid
+        - UI / demo
+        - docs / tooling
+    validations:
+      required: true
+  - type: checkboxes
+    id: invariants
+    attributes:
+      label: Safety invariants
+      options:
+        - label: This does not let an approval override a hard budget/category/expiry/per-transaction limit.
+        - label: This does not let an LLM override a failed objective criterion.
+        - label: Money remains integer cents.

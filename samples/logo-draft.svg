@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200" role="img" aria-label="Draft logo">
+  <rect x="0" y="0" width="400" height="200" fill="#F5E9DA"/>
+  <circle cx="78" cy="100" r="48" fill="#FFAA33" stroke="#111111" stroke-width="6"/>
+  <path d="M52 104h52" stroke="#333333" stroke-width="8"/>
+  <text x="150" y="92" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#222222">PLACEHOLDER</text>
+  <text x="150" y="122" font-family="Arial, sans-serif" font-size="20" fill="#444444">LOGO</text>
+  <text x="150" y="152" font-family="Arial, sans-serif" font-size="12" fill="#666666">lorem ipsum dolor sit amet</text>
+  <rect x="24" y="168" width="24" height="12" fill="#AA2222"/>
+  <rect x="54" y="168" width="24" height="12" fill="#22AA22"/>
+  <rect x="84" y="168" width="24" height="12" fill="#2222AA"/>
+  <rect x="114" y="168" width="24" height="12" fill="#AA22AA"/>
+</svg>

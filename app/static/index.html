@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1016">
+  <meta name="description" content="MandatePay — agentic commerce with a leash. An AI agent hires freelancers inside a human mandate, with PayPal authorization, verified milestones and a tamper-evident audit log.">
+  <title>MandatePay — agentic commerce with a leash</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="/static/vendor/ag-grid-community.min.js" defer></script>
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#workspace">Skip to the demo</a>
+
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="MandatePay home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none">
+          <path d="M16 3.5 26.5 7v8.1c0 6.2-4.1 10.9-10.5 13.4C9.6 25.9 5.5 21.2 5.5 15V7L16 3.5Z" fill="url(#shieldGrad)" stroke="#9bf6c7" stroke-width="1.2"/>
+          <path d="M11.4 16.2h9.2M16 11.2v10" stroke="#07130f" stroke-width="2.4" stroke-linecap="round"/>
+          <defs>
+            <linearGradient id="shieldGrad" x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#9bf6c7"/><stop offset="1" stop-color="#38bdf8"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </span>
+      <span class="brand-copy">
+        <strong>MandatePay</strong>
+        <em>Agentic commerce with a leash</em>
+      </span>
+    </a>
+
+    <div class="engine-badges" id="engineBadges" aria-live="polite"></div>
+
+    <div class="topbar-actions">
+      <span class="connection" id="connectionBadge" title="Live updates"><span class="dot"></span><span>connecting</span></span>
+      <a class="btn btn-ghost btn-sm" href="/docs" target="_blank" rel="noreferrer">API docs</a>
+      <button class="btn btn-ghost btn-sm" id="btnReset" type="button">Reset demo</button>
+    </div>
+  </header>
+
+  <section class="story-strip" aria-label="What this demo shows">
+    <div class="story-intro">
+      <span class="eyebrow">The story</span>
+      <p>An AI agent hires a freelancer. A human keeps the wallet.</p>
+    </div>
+    <ol class="story-steps" id="storySteps">
+      <li data-story="mandate">
+        <span class="story-num">1</span>
+        <span class="story-copy"><strong>Mandate</strong><em>budget + approval rule</em></span>
+      </li>
+      <li data-story="plan">
+        <span class="story-num">2</span>
+        <span class="story-copy"><strong>AI plan</strong><em>milestones + tests</em></span>
+      </li>
+      <li data-story="approval">
+        <span class="story-num">3</span>
+        <span class="story-copy"><strong>Human check</strong><em>authorize, don't release</em></span>
+      </li>
+      <li data-story="settle">
+        <span class="story-num">4</span>
+        <span class="story-copy"><strong>Verified payout</strong><em>rules first, AI second</em></span>
+      </li>
+    </ol>
+  </section>
+
+  <main class="workspace" id="workspace">
+    <aside class="col-left">
+      <section class="panel console-panel" id="consolePanel">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">Agent console</span>
+            <h2>Give the agent a mandate</h2>
+          </div>
+          <span class="tag tag-blue">language → policy</span>
+        </div>
+        <form id="commandForm" autocomplete="off">
+          <label class="sr-only" for="commandText">Instruction to the agent</label>
+          <textarea id="commandText" rows="4" spellcheck="false">Get me a logo for my bakery, max $60, ask me before anything over $40.</textarea>
+          <div class="example-row" aria-label="Example instructions">
+            <button type="button" class="chip" data-example="Get me a logo for my bakery, max $60, ask me before anything over $40.">Bakery logo · $60</button>
+            <button type="button" class="chip" data-example="Write a 900-word launch article for my coffee app, budget $80, ask me above $50.">Launch article · $80</button>
+            <button type="button" class="chip" data-example="Build a landing page for my studio, max $120, never spend more than $40 per transaction, ask above $60.">Landing page · $120</button>
+          </div>
+          <div class="console-foot">
+            <label class="check-row">
+              <input type="checkbox" id="commandPost" checked>
+              <span>Post the job immediately</span>
+            </label>
+            <span class="kbd-hint"><kbd>Ctrl</kbd> + <kbd>Enter</kbd></span>
+          </div>
+          <button class="btn btn-primary btn-block" id="btnCommand" type="submit">
+            <span class="btn-label">Create mandate &amp; plan</span>
+            <span class="spinner" aria-hidden="true"></span>
+          </button>
+        </form>
+        <div class="command-result" id="commandResult" hidden></div>
+      </section>
+
+      <section class="panel mandate-panel" id="mandatePanel">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">The mandate</span>
+            <h2>Human-set spending limits</h2>
+          </div>
+          <span class="pill" id="mandateStatus">no mandate</span>
+        </div>
+
+        <div class="empty-state" id="mandateEmpty">
+          <div class="empty-icon" aria-hidden="true">◎</div>
+          <p>No mandate yet. Tell the agent what it may buy, and where it must stop and ask.</p>
+        </div>
+
+        <div id="mandateBody" hidden>
+          <div class="budget-hero">
+            <div class="budget-line">
+              <strong id="budgetSpent">$0.00</strong>
+              <span id="budgetOf">of $0.00</span>
+            </div>
+            <div class="progress" role="progressbar" aria-labelledby="budgetSpent" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="budgetProgress">
+              <span id="budgetBar"></span>
+            </div>
+            <div class="budget-caption">
+              <span id="budgetCaption">Nothing spent yet</span>
+              <span id="budgetExpiry"></span>
+            </div>
+          </div>
+
+          <div class="stat-grid">
+            <div class="stat"><span>Committed</span><strong id="statCommitted">$0</strong></div>
+            <div class="stat"><span>Pending</span><strong id="statPending">$0</strong></div>
+            <div class="stat"><span>Available</span><strong id="statAvailable">$0</strong></div>
+            <div class="stat"><span>Released</span><strong id="statReleased">$0</strong></div>
+          </div>
+
+          <ul class="rule-list" id="ruleList"></ul>
+
+          <div class="spend-sim">
+            <div class="sim-head">
+              <span>Spend simulator</span>
+              <small>Same engine the agent must pass through</small>
+            </div>
+            <form id="spendForm" autocomplete="off">
+              <div class="sim-row">
+                <span class="sim-currency">$</span>
+                <input id="spendAmount" type="number" min="0" step="0.01" value="75" inputmode="decimal" aria-label="Amount to test">
+                <select id="spendCategory" aria-label="Spend category">
+                  <option value="design">design</option>
+                  <option value="writing">writing</option>
+                  <option value="development">development</option>
+                  <option value="video">video</option>
+                  <option value="audio">audio</option>
+                  <option value="research">research</option>
+                </select>
+                <button class="btn btn-small" id="btnSpend" type="submit">Check</button>
+              </div>
+            </form>
+            <div class="sim-result" id="spendResult" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel feed-panel" id="feedPanel">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">Agent feed</span>
+            <h2>What just happened</h2>
+          </div>
+          <span class="live-badge"><span class="dot"></span> live</span>
+        </div>
+        <ol class="agent-feed" id="agentFeed">
+          <li class="feed-empty">Events will appear here as the agent works.</li>
+        </ol>
+      </section>
+    </aside>
+
+    <div class="col-right">
+      <section class="panel jobs-panel" id="jobsPanel">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">Work in flight</span>
+            <h2>Jobs &amp; acceptance criteria</h2>
+          </div>
+          <span class="count-badge" id="jobCount">0 jobs</span>
+        </div>
+        <div class="jobs-list" id="jobsList"></div>
+        <div class="empty-state compact" id="jobsEmpty">
+          <div class="empty-icon" aria-hidden="true">⌁</div>
+          <p>No jobs yet. The agent posts one after it drafts a plan.</p>
+        </div>
+      </section>
+
+      <div class="split-row">
+        <section class="panel verify-panel" id="verifyPanel">
+          <div class="panel-head">
+            <div>
+              <span class="eyebrow">Verification studio</span>
+              <h2>Submit work, inspect evidence</h2>
+            </div>
+            <span class="pill" id="verifyVerdict">waiting</span>
+          </div>
+
+          <div class="studio" id="studio">
+            <div class="studio-grid">
+              <label class="field">
+                <span>Milestone</span>
+                <select id="studioMilestone"></select>
+              </label>
+              <label class="field">
+                <span>Demo package</span>
+                <select id="studioQuality">
+                  <option value="concept">Concept board · should pass</option>
+                  <option value="draft">Draft logo · should fail</option>
+                  <option value="final">Final logo · should pass</option>
+                  <option value="brandkit">Brand kit · should pass</option>
+                </select>
+              </label>
+            </div>
+
+            <label class="field">
+              <span>Freelancer notes <small>editable — the verifier reads this</small></span>
+              <textarea id="studioNotes" rows="5" spellcheck="true"></textarea>
+            </label>
+
+            <div class="file-picker" id="filePicker">
+              <span class="file-picker-label">Attach sample files</span>
+              <label class="check-pill"><input type="checkbox" data-sample="concept-board.svg"><span>concept-board.svg</span></label>
+              <label class="check-pill"><input type="checkbox" data-sample="logo-draft.svg"><span>logo-draft.svg</span></label>
+              <label class="check-pill"><input type="checkbox" data-sample="logo-final.svg"><span>logo-final.svg</span></label>
+              <label class="check-pill"><input type="checkbox" data-sample="brand-guide.md"><span>brand-guide.md</span></label>
+            </div>
+
+            <div class="upload-row">
+              <input type="file" id="studioUpload" accept=".svg,.png,.jpg,.jpeg,.gif,.webp,.pdf,.md,.txt,.csv,.json,.zip,.mp3,.wav,.mp4,.docx">
+              <button class="btn btn-small btn-ghost" id="btnUpload" type="button">Upload file</button>
+              <span class="upload-note">or attach your own deliverable</span>
+            </div>
+            <div class="upload-list" id="uploadList"></div>
+
+            <div class="studio-actions">
+              <button class="btn btn-small" id="btnSubmitWork" type="button">Submit only</button>
+              <button class="btn btn-small btn-primary" id="btnSubmitVerify" type="button">Submit &amp; verify</button>
+              <span class="studio-hint" id="studioHint">Pick a milestone from an authorized job.</span>
+            </div>
+          </div>
+
+          <div class="verification-result" id="verificationResult" aria-live="polite">
+            <div class="verify-empty">
+              <div class="scope" aria-hidden="true"></div>
+              <p>Verification evidence shows up here: each criterion, what was measured, and the verdict.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel approvals-panel" id="approvalsPanel">
+          <div class="panel-head">
+            <div>
+              <span class="eyebrow">Approval inbox</span>
+              <h2>Human in the loop</h2>
+            </div>
+            <span class="count-badge" id="approvalCount">0 pending</span>
+          </div>
+          <div class="approval-list" id="approvalList"></div>
+          <div class="empty-state compact" id="approvalsEmpty">
+            <div class="empty-icon" aria-hidden="true">✋</div>
+            <p>Nothing needs you right now. The agent can still spend inside its mandate.</p>
+          </div>
+          <div class="approval-note">
+            An approval is single-use, bound to one job, amount and category, and expires.
+          </div>
+        </section>
+      </div>
+
+      <section class="panel audit-panel" id="auditPanel">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">Audit &amp; money trail</span>
+            <h2>Every decision, hash-chained</h2>
+          </div>
+          <div class="audit-head-actions">
+            <span class="pill" id="chainStatus">checking…</span>
+            <button class="btn btn-small btn-ghost" id="btnVerifyChain" type="button">Verify chain</button>
+            <button class="btn btn-small btn-danger-ghost" id="btnTamper" type="button" title="Demo only: corrupt the newest audit row">Tamper test</button>
+          </div>
+        </div>
+
+        <div class="audit-stats">
+          <div class="mini-stat"><span>Released</span><strong id="auditReleased">$0</strong></div>
+          <div class="mini-stat"><span>Paid out</span><strong id="auditPayouts">$0</strong></div>
+          <div class="mini-stat"><span>Blocked attempts</span><strong id="auditBlocked">0</strong></div>
+          <div class="mini-stat"><span>Audit entries</span><strong id="auditEntries">0</strong></div>
+        </div>
+
+        <div class="grid-toolbar">
+          <div class="grid-tabs" role="tablist" aria-label="Audit or payments">
+            <button class="grid-tab is-active" type="button" data-tab="audit" role="tab" aria-selected="true">Audit log</button>
+            <button class="grid-tab" type="button" data-tab="payments" role="tab" aria-selected="false">Payments</button>
+          </div>
+          <input class="grid-search" id="gridSearch" type="search" placeholder="Quick filter…" aria-label="Filter grid rows">
+          <select class="grid-select" id="decisionFilter" aria-label="Filter by decision">
+            <option value="">All decisions</option>
+            <option value="allow">allow</option>
+            <option value="block">block</option>
+            <option value="require_approval">require_approval</option>
+            <option value="pass">pass</option>
+            <option value="revise">revise</option>
+            <option value="proposed">proposed</option>
+            <option value="info">info</option>
+          </select>
+        </div>
+
+        <div class="grid-wrap">
+          <div id="auditGrid" class="grid" role="tabpanel"></div>
+          <div id="paymentsGrid" class="grid" role="tabpanel" hidden></div>
+        </div>
+        <div class="grid-foot">
+          <span id="gridFoot">Loading audit trail…</span>
+          <span class="grid-foot-note">AG Grid Community · every row is linked to the previous hash</span>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <section class="how-it-works" aria-label="How it works">
+    <div class="how-card">
+      <span class="how-num">01</span>
+      <h3>Mandate, not a blank cheque</h3>
+      <p>The agent parses budget, category, per-transaction and daily limits plus a human-approval threshold. Hard rules cannot be overridden by an approval.</p>
+    </div>
+    <div class="how-card">
+      <span class="how-num">02</span>
+      <h3>Authorize first, release later</h3>
+      <p>PayPal Orders authorize the job total up front. Funds are held, not captured. Each milestone is a partial capture after verification passes.</p>
+    </div>
+    <div class="how-card">
+      <span class="how-num">03</span>
+      <h3>Evidence over vibes</h3>
+      <p>Deterministic file inspection checks dimensions, palette, transparency, placeholders and licence language. An optional model adds qualitative judgment — never a veto over hard failures.</p>
+    </div>
+    <div class="how-card">
+      <span class="how-num">04</span>
+      <h3>Payouts with a receipt</h3>
+      <p>The freelancer's share goes out via PayPal Payouts. The audit log is SHA-256 hash-chained, and the demo includes a tamper test to prove it.</p>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <span>MandatePay — built for the PayPal AI Hackathon, 2026.</span>
+    <span class="footer-links">
+      <a href="/docs" target="_blank" rel="noreferrer">OpenAPI</a>
+      <a href="https://developer.paypal.com/docs/api/orders/v2/" target="_blank" rel="noreferrer">PayPal Orders v2</a>
+      <a href="https://developer.paypal.com/docs/api/payments.payouts-batch/v1/" target="_blank" rel="noreferrer">Payouts</a>
+    </span>
+  </footer>
+
+  <div class="demo-dock" id="demoDock">
+    <div class="demo-dock-copy">
+      <span class="eyebrow">Demo director</span>
+      <strong id="demoTitle">Ready when you are</strong>
+      <span id="demoStatus">Runs the whole story end to end. You approve the $60 spend.</span>
+    </div>
+    <div class="demo-dots" id="demoDots" aria-hidden="true"></div>
+    <div class="demo-actions">
+      <button class="btn btn-small btn-ghost" id="btnDemoReset" type="button">Reset</button>
+      <button class="btn btn-small" id="btnDemoStep" type="button">Step</button>
+      <button class="btn btn-small btn-primary" id="btnDemoRun" type="button">
+        <span class="btn-label">Run full demo</span>
+        <span class="spinner" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="approvalModal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="approvalModalTitle" aria-describedby="approvalModalLede">
+      <button class="modal-close" id="btnModalClose" type="button" aria-label="Close">×</button>
+      <span class="eyebrow">Human in the loop</span>
+      <h2 id="approvalModalTitle">Approve this spend?</h2>
+      <p class="modal-lede" id="approvalModalLede">The agent wants to authorize funds above your threshold. Authorizing holds the money — it does not release it.</p>
+      <div class="approval-quote">
+        <div><span>Amount</span><strong id="modalAmount">—</strong></div>
+        <div><span>Job</span><strong id="modalJob">—</strong></div>
+        <div><span>Rule</span><strong id="modalReason">—</strong></div>
+      </div>
+      <label class="field">
+        <span>Note for the audit log <small>optional</small></span>
+        <input id="modalNote" type="text" maxlength="200" placeholder="e.g. approved for the bakery rebrand">
+      </label>
+      <div class="modal-actions">
+        <button class="btn btn-danger-ghost" id="btnReject" type="button">Reject</button>
+        <button class="btn btn-primary" id="btnApprove" type="button">
+          <span class="btn-label">Approve &amp; authorize</span>
+          <span class="spinner" aria-hidden="true"></span>
+        </button>
+      </div>
+      <p class="modal-foot" id="modalFoot">Single-use approval · expires with the job authorization window</p>
+    </div>
+  </div>
+
+  <div class="toast-stack" id="toasts" aria-live="polite" aria-atomic="false"></div>
+</body>
+</html>
