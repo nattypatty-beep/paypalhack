@@ -837,3 +837,13 @@ MIT — see [LICENSE](LICENSE).
 MandatePay is not affiliated with or endorsed by PayPal. PayPal and the PayPal
 logo are trademarks of PayPal, Inc. The "Hearth & Crumb" bakery in the demo is
 fictional.
+
+## Credits
+
+**Team:** Natalia Bernardo
+
+Made for PayPal AI Hackathon 2026
+
+**AI assistance:** Most of the code in this project was written with AI assistance:
+
+* **model** 
