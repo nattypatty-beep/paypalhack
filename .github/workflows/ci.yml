@@ -66,11 +66,25 @@ jobs:
 
       - name: Run container and smoke test
         run: |
-          docker run -d --name mandatepay -p 8012:8000 mandatepay:ci
+          if ! docker run -d --name mandatepay -p 8012:8000 mandatepay:ci; then
+            docker ps -a
+            exit 1
+          fi
+          ready=0
           for i in $(seq 1 30); do
-            if curl -fsS http://127.0.0.1:8012/api/health > /dev/null; then break; fi
+            if curl -fsS http://127.0.0.1:8012/api/health; then ready=1; break; fi
             sleep 1
           done
+          echo "health_ready=$ready"
+          docker ps -a
+          docker logs mandatepay || true
+          if [ "$ready" -ne 1 ]; then exit 1; fi
           python scripts/smoke.py --base-url http://127.0.0.1:8012
-          docker logs mandatepay
           docker rm -f mandatepay
+
+      - name: Container diagnostics on failure
+        if: failure()
+        run: |
+          docker ps -a || true
+          docker inspect mandatepay || true
+          docker logs mandatepay || true
