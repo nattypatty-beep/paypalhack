@@ -79,7 +79,7 @@ jobs:
           docker ps -a
           docker logs mandatepay || true
           if [ "$ready" -ne 1 ]; then exit 1; fi
-          python scripts/smoke.py --base-url http://127.0.0.1:8012
+          docker exec mandatepay python scripts/smoke.py --base-url http://127.0.0.1:8000
           docker rm -f mandatepay
 
       - name: Container diagnostics on failure
