@@ -21,8 +21,9 @@ You need:
 
 - the public GitHub repo;
 - an account on the hosting platform;
-- a username and password for the public demo (HTTP Basic auth is built in);
-- optionally, PayPal sandbox credentials.
+- optionally, a username and password if you want to gate the demo behind HTTP
+  Basic auth (off by default in `render.yaml`, so the hosted demo is public);
+- optionally, PayPal sandbox credentials and an LLM key.
 
 No PayPal credentials are required. The default deployment runs the deterministic
 mock adapter and the rules planner/verifier, so judges can complete the whole demo
@@ -37,21 +38,22 @@ offline.
 ## Option 1 — Render (recommended, blueprint included)
 
 The repository contains [`render.yaml`](../render.yaml), which builds the
-`Dockerfile`, sets `DATA_DIR=/data`, enables demo mode and turns on Basic auth.
+`Dockerfile`, sets `DATA_DIR=/data`, enables demo mode and leaves the demo public.
 
 1. Sign in to <https://render.com> with GitHub.
 2. Choose **New → Blueprint**.
 3. Select `nattypatty-beep/paypalhack`.
-4. Render reads `render.yaml`. When prompted, enter a strong
-   `BASIC_AUTH_PASSWORD`. The username defaults to `judge`.
-5. Click **Apply** and wait for the image build.
-6. Open the generated `https://mandatepay-*.onrender.com` URL. Your browser asks
-   for the username and password.
-7. Click **Run full demo**.
+4. Click **Apply** and wait for the image build.
+5. Open the generated `https://mandatepay-*.onrender.com` URL.
+6. Click **Run full demo**.
 
 You can also use the one-click blueprint link:
 
 <https://render.com/deploy?repo=https://github.com/nattypatty-beep/paypalhack>
+
+To make the demo private, uncomment the `BASIC_AUTH_USER` and
+`BASIC_AUTH_PASSWORD` block in `render.yaml`, set a strong password, and sync the
+blueprint.
 
 ### Free plan caveat
 
@@ -92,6 +94,30 @@ https://YOUR-SERVICE.onrender.com/api/webhooks/paypal
 See [PAYPAL.md](PAYPAL.md) for the sandbox app, Payouts permissions and webhook
 events.
 
+### Add an AI planner/verifier (optional)
+
+The app is correct without a model: the deterministic rules planner and verifier
+stay authoritative. To let a model draft plans and add a qualitative review, set:
+
+| Key | Example | Notes |
+| --- | --- | --- |
+| `LLM_PROVIDER` | `openai` | `openai`, `anthropic`, `ollama`, `auto` or `none` |
+| `LLM_API_KEY` | `sk-...` | Not needed for `ollama` |
+| `LLM_MODEL` | `gpt-4o-mini` | Exact model ID from the provider |
+| `LLM_BASE_URL` | empty | Only for OpenAI-compatible or Ollama endpoints |
+
+- `auto` with a key and model selects OpenAI.
+- `anthropic` uses `https://api.anthropic.com` unless `LLM_BASE_URL` is set.
+- `ollama` needs `LLM_MODEL` and a `LLM_BASE_URL` ending in `/v1` that Render can
+  reach. A laptop's `localhost:11434` is *not* reachable from Render.
+
+Redeploy after saving. The header replaces **Rules engine · no key ·
+deterministic** with the provider and model name.
+
+A model timeout, error or malformed reply never breaks the demo: the app falls
+back to the rules engine, records the failure, and hard rule failures can never
+be overridden by a model.
+
 ---
 
 ## Option 2 — Railway
@@ -103,15 +129,14 @@ events.
    ```text
    DATA_DIR=/data
    DEMO_MODE=true
-   PAYPAL_FORCE_MOCK=true
+   PAYPAL_FORCE_MOCK=false
    ALLOW_LIVE=false
-   BASIC_AUTH_USER=judge
-   BASIC_AUTH_PASSWORD=<strong password>
    ```
 
 4. Add a **Volume** mounted at `/data`.
 5. Under **Networking**, generate a public domain.
-6. Open the URL and approve the browser's Basic auth prompt.
+6. Open the URL. Add `BASIC_AUTH_USER` and `BASIC_AUTH_PASSWORD` if you want a
+   login prompt.
 
 Railway keeps the volume across deploys, so the demo state survives.
 
@@ -137,7 +162,7 @@ Make sure `fly.toml` contains the volume mount and `DATA_DIR`:
 [env]
   DATA_DIR = "/data"
   DEMO_MODE = "true"
-  PAYPAL_FORCE_MOCK = "true"
+  PAYPAL_FORCE_MOCK = "false"
   ALLOW_LIVE = "false"
 ```
 
@@ -155,7 +180,7 @@ docker run -d --name mandatepay --restart unless-stopped \
   -e BASIC_AUTH_USER=judge \
   -e BASIC_AUTH_PASSWORD='<strong password>' \
   -e DEMO_MODE=true \
-  -e PAYPAL_FORCE_MOCK=true \
+  -e PAYPAL_FORCE_MOCK=false \
   -e ALLOW_LIVE=false \
   mandatepay
 ```
@@ -204,17 +229,21 @@ Without Docker, use the normal Python quickstart in the
 | --- | --- | --- |
 | `DEMO_MODE` | `true` | Enables reset, sample packages and tamper test |
 | `DATA_DIR` | `/data` | Persistent volume for SQLite and uploads |
-| `BASIC_AUTH_USER` | `judge` | Public-demo username |
-| `BASIC_AUTH_PASSWORD` | strong secret | Public-demo password |
-| `PAYPAL_FORCE_MOCK` | `true` | Guarantees no accidental sandbox/live calls |
+| `BASIC_AUTH_USER` | empty | Optional public-demo username |
+| `BASIC_AUTH_PASSWORD` | empty | Optional public-demo password; set both to enable auth |
+| `PAYPAL_FORCE_MOCK` | `false` | Safe: without credentials the app still uses the mock |
 | `PAYPAL_ENV` | `sandbox` | Only relevant if you add credentials |
+| `PAYPAL_CLIENT_ID` / `PAYPAL_CLIENT_SECRET` | empty | Both required to leave mock mode |
+| `FREELANCER_EMAIL` | `freelancer@example.com` | Must be a Payouts-capable sandbox account for real sandbox payouts |
 | `ALLOW_LIVE` | `false` | Blocks live money even with live credentials |
+| `LLM_PROVIDER` / `LLM_MODEL` / `LLM_API_KEY` | empty | Optional AI planner/verifier |
 | `MAX_UPLOAD_MB` | `8` | Keeps uploads bounded |
 | `APPROVAL_TTL_MINUTES` | `30` | Approval decision window |
 | `APPROVAL_TOKEN_TTL_MINUTES` | `20` | Approved-token use window |
 
-If you set `PAYPAL_FORCE_MOCK=false` and provide sandbox credentials, the app uses
-the real sandbox Orders/Payouts APIs. The mock remains the default.
+`PAYPAL_FORCE_MOCK=false` does **not** move real money on its own. The app uses
+the mock until both PayPal credentials are present; with sandbox credentials it
+uses the real sandbox Orders/Payouts APIs.
 
 ---
 
@@ -287,7 +316,7 @@ and tamper endpoints.
 - [ ] Strong `BASIC_AUTH_PASSWORD`; do not commit `.env`.
 - [ ] `ALLOW_LIVE` unset/false.
 - [ ] `PAYPAL_ENV=sandbox` if credentials are configured.
-- [ ] `PAYPAL_FORCE_MOCK=true` unless you are actively testing the sandbox.
+- [ ] `PAYPAL_FORCE_MOCK` unset/false, or `true` if you want to guarantee the mock.
 - [ ] HTTPS only (automatic on Render/Railway/Fly/Caddy).
 - [ ] `PAYPAL_WEBHOOK_ID` set if the webhook endpoint is public; unverified events
       are recorded but never applied.

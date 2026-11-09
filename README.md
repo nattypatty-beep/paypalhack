@@ -258,9 +258,10 @@ docker run -d -p 8000:8000 -v mandatepay_data:/data \
 Full instructions, Railway/Fly/VPS examples, SSE proxy notes, webhook setup and
 a security checklist: [docs/DEPLOY.md](docs/DEPLOY.md).
 
-> Public deployments should keep `PAYPAL_FORCE_MOCK=true` or use sandbox
-> credentials. `ALLOW_LIVE` must stay unset/false. Basic auth is one shared login,
-> not multi-user authorization; read [SECURITY.md](SECURITY.md) first.
+> Public deployments are safe with `PAYPAL_FORCE_MOCK=false`: the app still uses
+> the mock until both sandbox credentials are set. `ALLOW_LIVE` must stay
+> unset/false. Basic auth is one shared login, not multi-user authorization; read
+> [SECURITY.md](SECURITY.md) first.
 
 ---
 

@@ -3,6 +3,10 @@
 # Free plan is fine for a hackathon demo, but /data is ephemeral: the demo
 # database resets whenever Render restarts or redeploys the service.
 # To keep state, switch plan to starter and uncomment the disk block below.
+#
+# The PayPal and AI variables are declared with `sync: false`, which means
+# "leave this blank in the blueprint and manage the value in the Render
+# dashboard". Add the real secrets there, never in this file.
 services:
   - type: web
     name: mandatepay
@@ -16,14 +20,40 @@ services:
         value: "true"
       - key: DATA_DIR
         value: /data
+      # Safe default: the app still uses the deterministic mock until BOTH
+      # PayPal credentials below are set. This flag alone never moves money.
       - key: PAYPAL_FORCE_MOCK
+        value: "false"
+      - key: PAYPAL_ENV
+        value: sandbox
+      - key: PAYPAL_PAYOUTS_ENABLED
         value: "true"
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: PAYPAL_WEBHOOK_ID
+        sync: false
+      - key: FREELANCER_NAME
+        value: Avery Quinn
+      # Use the email of a PayPal sandbox account that can receive Payouts.
+      - key: FREELANCER_EMAIL
+        sync: false
+      # Hard block on live money. Keep this false for the hackathon.
       - key: ALLOW_LIVE
         value: "false"
-      - key: BASIC_AUTH_USER
-        value: judge
-      - key: BASIC_AUTH_PASSWORD
+      # Optional AI planner/verifier. Leave blank to keep the rules engine.
+      - key: LLM_PROVIDER
         sync: false
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_MODEL
+        sync: false
+      # Optional shared login. Uncomment BOTH lines to make the demo private.
+      # - key: BASIC_AUTH_USER
+      #   value: judge
+      # - key: BASIC_AUTH_PASSWORD
+      #   sync: false
     # disks:
     #   - name: mandatepay-data
     #     mountPath: /data
