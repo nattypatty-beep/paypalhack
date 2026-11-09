@@ -9,6 +9,12 @@
 ![AG Grid Community](https://img.shields.io/badge/AG%20Grid-Community%20v36-1f6feb)
 ![Tests](https://img.shields.io/badge/tests-53%20passing-2ea44f)
 
+> ### ▶ [Try the live demo](https://mandatepay-byfz.onrender.com/)
+>
+> <https://mandatepay-byfz.onrender.com/> — no login, no credentials, no install.
+> Open it, click **Run full demo**, and approve the $60 hold when asked. The first
+> request can take 30–60 seconds while Render's free instance wakes up.
+
 MandatePay is an AI procurement agent that can hire freelancers — but only inside
 a human-set **mandate**. The agent parses a plain-English instruction into a
 budget, category, per-transaction and daily limits, and an approval threshold. It
@@ -144,8 +150,14 @@ fictional AI claims.
 
 ## Quickstart
 
-**Requirements:** Python 3.11+ (tested on 3.13). No Node, no database server, no
-build step, no credentials.
+**Just want to try it?** Open the hosted demo — no install or credentials:
+
+**<https://mandatepay-byfz.onrender.com/>**
+
+Click **Run full demo** and approve the $60 hold when the modal appears.
+
+**Prefer to run it locally?** Requirements: Python 3.11+ (tested on 3.13). No Node,
+no database server, no build step, no credentials.
 
 ### Windows (PowerShell)
 
@@ -211,6 +223,9 @@ against a local instance.
 ---
 
 ## Deploy a public demo
+
+A reference deployment is live at **<https://mandatepay-byfz.onrender.com/>**
+(Render free plan, Docker, mock PayPal, rules engine, no auth).
 
 The app is a long-lived FastAPI process with SQLite and local uploads, so it
 needs a container host with a persistent disk — **not** Vercel, Netlify or GitHub

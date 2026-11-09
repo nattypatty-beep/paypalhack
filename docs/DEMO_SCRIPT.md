@@ -20,6 +20,10 @@ network dependency during recording.
    python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
    ```
 
+   If the local install misbehaves, the same build is hosted at
+   <https://mandatepay-byfz.onrender.com/>. Click **Reset demo** first, and allow
+   30–60 seconds for the free instance to wake up.
+
 2. Open <http://127.0.0.1:8000> in a clean browser window.
    - Use a 1080p or larger window; the dashboard is wide.
    - Zoom 100% (or 110% if text looks small on video).

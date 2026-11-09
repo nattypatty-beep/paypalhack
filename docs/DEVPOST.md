@@ -173,7 +173,8 @@ inspection.
 - Support refunds/disputes and multi-currency mandates.
 - Add more inspections (fonts, accessibility, contrast, code tests) and more
   category templates.
-- Ship a hosted sandbox with a public judge link.
+- Add a persistent disk and real sandbox credentials to the hosted demo so its
+  state survives restarts and it exercises live PayPal APIs.
 - Explore policy templates for common agent tasks beyond freelancing: cloud
   spend, ad budgets, data purchases, API credits.
 
@@ -185,7 +186,15 @@ inspection.
 
 ## Try it out
 
+**Live demo (no login, no install):** <https://mandatepay-byfz.onrender.com/>
+
+Open the URL, click **Run full demo**, and approve the $60 hold when the modal
+appears. The first request can take 30–60 seconds while the free Render instance
+wakes up.
+
 Repository: <https://github.com/nattypatty-beep/paypalhack>
+
+Or run it locally:
 
 ```bash
 git clone https://github.com/nattypatty-beep/paypalhack.git
