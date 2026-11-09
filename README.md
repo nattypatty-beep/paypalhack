@@ -7,7 +7,7 @@
 ![License MIT](https://img.shields.io/badge/license-MIT-7af0bd)
 ![PayPal Orders v2](https://img.shields.io/badge/PayPal-Orders%20v2%20%2B%20Payouts-003087)
 ![AG Grid Community](https://img.shields.io/badge/AG%20Grid-Community%20v36-1f6feb)
-![Tests](https://img.shields.io/badge/tests-45%20passing-2ea44f)
+![Tests](https://img.shields.io/badge/tests-53%20passing-2ea44f)
 
 MandatePay is an AI procurement agent that can hire freelancers — but only inside
 a human-set **mandate**. The agent parses a plain-English instruction into a
@@ -36,6 +36,7 @@ Built for the **PayPal AI Hackathon 2026**.
 - [Why this matters](#why-this-matters)
 - [What is in the box](#what-is-in-the-box)
 - [Quickstart](#quickstart)
+- [Deploy a public demo](#deploy-a-public-demo)
 - [Configuration](#configuration)
 - [How the money works](#how-the-money-works)
 - [Mandate rules](#mandate-rules)
@@ -119,8 +120,9 @@ credits tomorrow.
 | Audit log | Append-only SQLite with SHA-256 hash chain and a tamper-test button |
 | UI | Vanilla JS + CSS, no build step; AG Grid Community v36 vendored locally |
 | Offline mode | Mock PayPal + deterministic rules engines; no network required |
-| Tests | 45 pytest tests covering rules, planner, verifier, API flow and tamper detection |
-| Docs | Architecture, PayPal setup, timed demo script, Devpost copy, security policy |
+| Public demo | Dockerfile, Render blueprint and optional HTTP Basic auth |
+| Tests | 53 pytest tests covering rules, planner, verifier, API flow, auth and tamper detection |
+| Docs | Architecture, PayPal setup, deployment, timed demo script, Devpost copy, security policy |
 
 ### What is mocked vs real
 
@@ -129,7 +131,7 @@ credits tomorrow.
 | PayPal orders and authorizations | Deterministic local mock | Real PayPal sandbox Orders v2 |
 | Captures and voids | Local state machine | Real PayPal Payments v2 |
 | Payouts | Deterministic success | Real PayPal Payouts batch |
-| Webhooks | Accepted for demo | Signature verified against PayPal |
+| Webhooks | Audited; trusted only if `PAYPAL_WEBHOOK_ID` is set | Signature verified against PayPal |
 | Mandate engine | Real code | Same real code |
 | Verification | Real rules engine | Same rules + optional LLM |
 | Audit chain | Real SHA-256 chain | Same real chain |
@@ -208,6 +210,45 @@ against a local instance.
 
 ---
 
+## Deploy a public demo
+
+The app is a long-lived FastAPI process with SQLite and local uploads, so it
+needs a container host with a persistent disk — **not** Vercel, Netlify or GitHub
+Pages. Supabase is optional and not required by the current `sqlite3` store.
+
+The repository ships a `Dockerfile` and a Render blueprint:
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/nattypatty-beep/paypalhack)
+
+1. Open <https://render.com/deploy?repo=https://github.com/nattypatty-beep/paypalhack>
+   or create a **New → Blueprint** from the repo.
+2. Set `BASIC_AUTH_PASSWORD` when prompted. The username defaults to `judge`.
+3. Wait for the Docker build and open the generated HTTPS URL.
+4. Log in and click **Run full demo**.
+
+`render.yaml` enables demo mode, forces the mock PayPal adapter, sets
+`DATA_DIR=/data` and gates the site behind Basic auth. Render's free plan has an
+ephemeral filesystem, so the demo resets when the service restarts; add the
+commented disk block (and a paid instance) to keep state.
+
+Any Docker host works:
+
+```bash
+docker build -t mandatepay .
+docker run -d -p 8000:8000 -v mandatepay_data:/data \
+  -e BASIC_AUTH_USER=judge -e BASIC_AUTH_PASSWORD='<strong password>' \
+  mandatepay
+```
+
+Full instructions, Railway/Fly/VPS examples, SSE proxy notes, webhook setup and
+a security checklist: [docs/DEPLOY.md](docs/DEPLOY.md).
+
+> Public deployments should keep `PAYPAL_FORCE_MOCK=true` or use sandbox
+> credentials. `ALLOW_LIVE` must stay unset/false. Basic auth is one shared login,
+> not multi-user authorization; read [SECURITY.md](SECURITY.md) first.
+
+---
+
 ## Configuration
 
 Copy `.env.example` to `.env` only when you want to change a default. The app
@@ -222,6 +263,7 @@ loads `.env` automatically without a third-party dotenv dependency.
 | `MAX_UPLOAD_MB` | `8` | Upload size limit |
 | `APPROVAL_TTL_MINUTES` | `30` | How long a human has to decide |
 | `APPROVAL_TOKEN_TTL_MINUTES` | `20` | How long an approved token can be used |
+| `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD` | empty | Set both to enable HTTP Basic auth for a public demo |
 | `PAYPAL_CLIENT_ID` / `PAYPAL_CLIENT_SECRET` | empty | Sandbox app credentials; empty means mock |
 | `PAYPAL_ENV` | `sandbox` | `sandbox` or `live` |
 | `PAYPAL_WEBHOOK_ID` | empty | Enables webhook signature verification |
@@ -543,10 +585,12 @@ app/
   util.py        Time, IDs and canonical JSON helpers
   static/        Vanilla UI, styles, app.js, vendored AG Grid
 samples/         Demo deliverables engineered to pass or fail
-tests/           45-test pytest suite
-docs/            Architecture, PayPal, demo script, Devpost copy, screenshot
+tests/           53-test pytest suite
+docs/            Architecture, PayPal, deployment, demo script, Devpost copy, screenshot
 scripts/         Smoke test
-.github/         CI, Dependabot, issue and PR templates
+Dockerfile       Non-root production image with a /data volume
+render.yaml      Render blueprint: demo mode, mock PayPal, Basic auth
+.github/         CI (tests, smoke, Docker build), Dependabot, issue and PR templates
 ```
 
 ---
@@ -566,6 +610,7 @@ Coverage includes:
 - planner budget-sum invariant across categories and budgets;
 - mock-PayPal end-to-end flow: block → approve → authorize → reject draft → release;
 - audit chain verification and tamper detection;
+- optional Basic auth: protected paths, health/webhook exemptions and malformed headers;
 - objective sample inspection and malformed-file handling.
 
 Useful commands:
@@ -664,8 +709,9 @@ require a larger, simpler, transparent, placeholder-free master.
 
 ### Can I use this in production?
 
-No. It is a hackathon prototype without authentication, tenant isolation,
-malware scanning, refunds, reconciliation or legal escrow. Read
+No. It is a hackathon prototype with only optional shared Basic auth — no user
+accounts, tenant isolation, malware scanning, refunds, reconciliation or legal
+escrow. Read
 [SECURITY.md](SECURITY.md) before deploying anywhere.
 
 ### Why AG Grid?
@@ -737,8 +783,9 @@ The full submission copy is in [docs/DEVPOST.md](docs/DEVPOST.md).
 - Uploaded files are stored locally and served with a restrictive content policy.
   A production deployment needs malware scanning, object storage and per-tenant
   isolation.
-- There is no authentication. Do not expose this instance to the internet without
-  an authenticating reverse proxy.
+- HTTP Basic auth is optional and off by default. It is a single shared login,
+  not per-user authorization. Enable it before exposing the demo publicly, and
+  add real identity/tenant controls before handling anyone else's money.
 - There is no refund, dispute or chargeback workflow. Cancelling voids the
   remaining authorization; it does not refund captured money.
 - This is a hackathon prototype, not a licensed escrow or money-transmission
@@ -753,6 +800,8 @@ and safe-deployment checklist.
 
 - [Architecture](docs/ARCHITECTURE.md) — components, invariants, data model,
   settlement flow, extension points.
+- [Deployment](docs/DEPLOY.md) — Render, Railway, Fly.io and Docker, persistent
+  storage, Basic auth, webhooks, SSE and a public-demo security checklist.
 - [PayPal integration](docs/PAYPAL.md) — sandbox setup, exact API calls,
   idempotency, webhooks, live guardrails, troubleshooting.
 - [Demo script](docs/DEMO_SCRIPT.md) — timed shot list for a sub-three-minute

@@ -103,7 +103,7 @@ initialization fails.
 link. The genesis row links to 64 zeroes. The audit chain is not just a log; it
 is a tamper-evident receipt of who allowed what, and why.
 
-**Tests:** 45 pytest tests covering strict threshold semantics, hard blocks,
+**Tests:** 53 pytest tests covering strict threshold semantics, hard blocks,
 approval binding and single use, capture limits, the planner budget invariant,
 the end-to-end API flow, audit verification/tamper detection, and objective file
 inspection.
@@ -146,7 +146,7 @@ inspection.
 - Objective verification with per-criterion evidence a human can audit.
 - A polished, dependency-light UI that runs offline and still uses AG Grid for
   the money trail.
-- 45 passing tests and a smoke test that a judge can run against a live server.
+- 53 passing tests and a smoke test that a judge can run against a live server.
 - Documentation that states the limitations plainly.
 
 ## What we learned
@@ -167,7 +167,8 @@ inspection.
 
 - Anchor the audit chain head to an external append-only store or timestamping
   service.
-- Add authentication, tenants and per-tenant upload isolation.
+- Add real user accounts (beyond the optional shared Basic auth), tenants and
+  per-tenant upload isolation.
 - Add a reconciliation worker for the capture→payout gap.
 - Support refunds/disputes and multi-currency mandates.
 - Add more inspections (fonts, accessibility, contrast, code tests) and more

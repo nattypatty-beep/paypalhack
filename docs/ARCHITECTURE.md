@@ -315,7 +315,7 @@ Source: [`app/paypal.py`](../app/paypal.py). Full sandbox details are in
 | `capture_authorization` | `POST /v2/payments/authorizations/{id}/capture` | remaining-amount check, partial capture |
 | `void_authorization` | `POST /v2/payments/authorizations/{id}/void` | `VOIDED` |
 | `create_payout` | `POST /v1/payments/payouts` | deterministic success |
-| `verify_webhook` | `POST /v1/notifications/verify-webhook-signature` | always true |
+| `verify_webhook` | `POST /v1/notifications/verify-webhook-signature` | true only when `PAYPAL_WEBHOOK_ID` is configured |
 
 Mode selection:
 
@@ -441,7 +441,7 @@ payment on an LLM response; verification rules always run.
 
 ## 10. Testing strategy
 
-The suite is 45 tests and runs entirely in mock mode with a temporary data
+The suite is 53 tests and runs entirely in mock mode with a temporary data
 directory.
 
 | Area | What is asserted |
@@ -469,7 +469,8 @@ after, and asserts the hard budget block and chain health.
 
 ## 11. Deliberate non-goals
 
-- No real user accounts or authentication; this is a single-principal demo.
+- No real user accounts; optional shared HTTP Basic auth only. This is a
+  single-principal demo.
 - No multi-currency conversion; a mandate has one currency.
 - No dispute/chargeback workflow.
 - No distributed transaction between capture and Payout. The app records the

@@ -1,0 +1,30 @@
+# Render blueprint for a public MandatePay demo.
+#
+# Free plan is fine for a hackathon demo, but /data is ephemeral: the demo
+# database resets whenever Render restarts or redeploys the service.
+# To keep state, switch plan to starter and uncomment the disk block below.
+services:
+  - type: web
+    name: mandatepay
+    runtime: docker
+    plan: free
+    region: oregon
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: DEMO_MODE
+        value: "true"
+      - key: DATA_DIR
+        value: /data
+      - key: PAYPAL_FORCE_MOCK
+        value: "true"
+      - key: ALLOW_LIVE
+        value: "false"
+      - key: BASIC_AUTH_USER
+        value: judge
+      - key: BASIC_AUTH_PASSWORD
+        sync: false
+    # disks:
+    #   - name: mandatepay-data
+    #     mountPath: /data
+    #     sizeGB: 1

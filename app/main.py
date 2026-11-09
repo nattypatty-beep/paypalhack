@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import asyncio
+import base64
+import hmac
 import json
 import logging
 from contextlib import asynccontextmanager
@@ -36,9 +38,20 @@ class DemoSubmitRequest(BaseModel):
     quality: str = Field(default="final", pattern="^(concept|draft|final|brandkit)$")
 
 
+# Endpoints that must stay reachable without Basic auth:
+#   * /api/health      -> platform health checks
+#   * /api/webhooks/*  -> PayPal cannot send a browser login; the webhook
+#                         signature is verified inside the service instead.
+PUBLIC_PATHS = {"/api/health", "/api/webhooks/paypal"}
+
+
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or load_settings()
     service = AppService(settings)
+    if bool(settings.basic_auth_user) != bool(settings.basic_auth_password):
+        log.warning(
+            "Basic auth disabled: set both BASIC_AUTH_USER and BASIC_AUTH_PASSWORD to enable it."
+        )
 
     @asynccontextmanager
     async def lifespan(_: FastAPI):
@@ -59,6 +72,33 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
     app.state.service = service
+
+    @app.middleware("http")
+    async def basic_auth(request: Request, call_next):
+        if settings.auth_enabled and request.url.path not in PUBLIC_PATHS:
+            authorized = False
+            scheme, _, credentials = request.headers.get("authorization", "").partition(" ")
+            if scheme.lower() == "basic" and credentials:
+                try:
+                    decoded = base64.b64decode(credentials, validate=True).decode("utf-8")
+                except (ValueError, UnicodeDecodeError):
+                    decoded = ""
+                username, separator, password = decoded.partition(":")
+                if separator:
+                    user_ok = hmac.compare_digest(
+                        username.encode("utf-8"), settings.basic_auth_user.encode("utf-8")
+                    )
+                    password_ok = hmac.compare_digest(
+                        password.encode("utf-8"), settings.basic_auth_password.encode("utf-8")
+                    )
+                    authorized = user_ok and password_ok
+            if not authorized:
+                return JSONResponse(
+                    status_code=401,
+                    content={"error": "Authentication required."},
+                    headers={"WWW-Authenticate": 'Basic realm="MandatePay", charset="UTF-8"'},
+                )
+        return await call_next(request)
 
     @app.middleware("http")
     async def security_headers(request: Request, call_next):
@@ -105,6 +145,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "paypal_mode": service.paypal.mode,
             "llm_enabled": service.llm.enabled,
             "llm_provider": service.llm.provider,
+            "auth_enabled": settings.auth_enabled,
             "audit_entries": chain.get("count", 0),
             "audit_ok": chain.get("ok", False),
         }

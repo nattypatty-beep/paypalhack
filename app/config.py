@@ -65,6 +65,11 @@ class Settings:
     approval_ttl_minutes: int = 30
     approval_token_ttl_minutes: int = 20
 
+    # --- access control ----------------------------------------------------
+    # Optional HTTP Basic auth for public demos. Both must be set to enable it.
+    basic_auth_user: str = ""
+    basic_auth_password: str = ""
+
     # --- PayPal ------------------------------------------------------------
     paypal_client_id: str = ""
     paypal_client_secret: str = ""
@@ -86,6 +91,10 @@ class Settings:
     llm_min_confidence: float = 0.7
 
     # --- derived -----------------------------------------------------------
+    @property
+    def auth_enabled(self) -> bool:
+        return bool(self.basic_auth_user and self.basic_auth_password)
+
     @property
     def database_path(self) -> Path:
         return self.data_dir / "mandatepay.sqlite3"
@@ -157,6 +166,8 @@ def load_settings() -> Settings:
         max_upload_mb=_int("MAX_UPLOAD_MB", 8),
         approval_ttl_minutes=_int("APPROVAL_TTL_MINUTES", 30),
         approval_token_ttl_minutes=_int("APPROVAL_TOKEN_TTL_MINUTES", 20),
+        basic_auth_user=_str("BASIC_AUTH_USER"),
+        basic_auth_password=_str("BASIC_AUTH_PASSWORD"),
         paypal_client_id=_str("PAYPAL_CLIENT_ID"),
         paypal_client_secret=_str("PAYPAL_CLIENT_SECRET"),
         paypal_env=_str("PAYPAL_ENV", "sandbox"),

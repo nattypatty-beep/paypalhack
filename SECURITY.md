@@ -139,12 +139,16 @@ mitigation as soon as is practical for a hackathon project.
 These are intentional for the hackathon. A production deployment must address
 them.
 
-1. **No authentication or authorization.** The app assumes a single local
-   principal. Anyone who can reach the port can act as the human, including
-   approving spends. Do not expose it to the internet without an authenticating
-   reverse proxy and per-user isolation.
-2. **No CSRF protection.** The API is same-origin and unauthenticated; adding
-   cookie auth without CSRF tokens would be unsafe.
+1. **At most one shared credential.** HTTP Basic auth is optional and turns on
+   only when both `BASIC_AUTH_USER` and `BASIC_AUTH_PASSWORD` are set. Anyone who
+   knows that password can act as the human, including approving spends. There
+   are no user accounts, roles or per-user isolation. Enable Basic auth before a
+   public demo and add real identity/tenant controls before handling anyone
+   else's money.
+2. **No CSRF protection.** The API is same-origin. Basic auth is sent on every
+   request rather than stored as a cookie, which limits classic CSRF, but there
+   is no token-based protection and adding cookie auth without CSRF tokens would
+   be unsafe.
 3. **No global Content-Security-Policy on the HTML shell.** The app uses inline
    styles/scripts? It serves static files; a production deploy should add a
    strict CSP and a nonce/hash policy.

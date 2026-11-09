@@ -407,7 +407,10 @@ class PayPalClient:
     # -- webhooks ---------------------------------------------------------
     async def verify_webhook(self, headers: dict[str, str], event: dict) -> bool:
         if self.is_mock:
-            return True
+            # The mock cannot verify a signature. Only treat events as trusted
+            # when the operator deliberately configured a webhook ID for the
+            # demo; otherwise accept the event for audit but do not apply it.
+            return bool(self.settings.paypal_webhook_id)
         if not self.settings.paypal_webhook_id:
             return False
         payload = {
