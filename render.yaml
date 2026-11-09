@@ -1,12 +1,11 @@
 # Render blueprint for a public MandatePay demo.
 #
-# Free plan is fine for a hackathon demo, but /data is ephemeral: the demo
-# database resets whenever Render restarts or redeploys the service.
-# To keep state, switch plan to starter and uncomment the disk block below.
+# Default: deterministic mock PayPal + rules engine. No credentials are needed,
+# and no real or sandbox money is ever called.
 #
-# The PayPal and AI variables are declared with `sync: false`, which means
-# "leave this blank in the blueprint and manage the value in the Render
-# dashboard". Add the real secrets there, never in this file.
+# The free plan is fine for a hackathon demo, but /data is ephemeral: the demo
+# database resets whenever Render restarts or redeploys the service. To keep
+# state, switch to a paid instance and uncomment the disk block below.
 services:
   - type: web
     name: mandatepay
@@ -20,39 +19,39 @@ services:
         value: "true"
       - key: DATA_DIR
         value: /data
-      # Safe default: the app still uses the deterministic mock until BOTH
-      # PayPal credentials below are set. This flag alone never moves money.
+      # Guarantees the deterministic mock: no sandbox or live PayPal calls.
       - key: PAYPAL_FORCE_MOCK
-        value: "false"
+        value: "true"
       - key: PAYPAL_ENV
         value: sandbox
-      - key: PAYPAL_PAYOUTS_ENABLED
-        value: "true"
-      - key: PAYPAL_CLIENT_ID
-        sync: false
-      - key: PAYPAL_CLIENT_SECRET
-        sync: false
-      - key: PAYPAL_WEBHOOK_ID
-        sync: false
-      - key: FREELANCER_NAME
-        value: Avery Quinn
-      # Use the email of a PayPal sandbox account that can receive Payouts.
-      - key: FREELANCER_EMAIL
-        sync: false
-      # Hard block on live money. Keep this false for the hackathon.
+      # Hard block on live money. Keep this false.
       - key: ALLOW_LIVE
         value: "false"
-      # Optional AI planner/verifier. Leave blank to keep the rules engine.
-      - key: LLM_PROVIDER
-        sync: false
-      - key: LLM_API_KEY
-        sync: false
-      - key: LLM_MODEL
-        sync: false
-      # Optional shared login. Uncomment BOTH lines to make the demo private.
+      # Optional: make the demo private. Uncomment both and set a password.
       # - key: BASIC_AUTH_USER
       #   value: judge
       # - key: BASIC_AUTH_PASSWORD
+      #   sync: false
+      # Optional: real PayPal sandbox. Uncomment these, set
+      # PAYPAL_FORCE_MOCK=false, and add the values in the Render dashboard.
+      # - key: PAYPAL_CLIENT_ID
+      #   sync: false
+      # - key: PAYPAL_CLIENT_SECRET
+      #   sync: false
+      # - key: PAYPAL_WEBHOOK_ID
+      #   sync: false
+      # - key: PAYPAL_PAYOUTS_ENABLED
+      #   value: "true"
+      # - key: FREELANCER_NAME
+      #   value: Avery Quinn
+      # - key: FREELANCER_EMAIL
+      #   sync: false
+      # Optional: AI planner/verifier. Uncomment and fill in the dashboard.
+      # - key: LLM_PROVIDER
+      #   sync: false
+      # - key: LLM_API_KEY
+      #   sync: false
+      # - key: LLM_MODEL
       #   sync: false
     # disks:
     #   - name: mandatepay-data

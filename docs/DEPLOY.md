@@ -129,7 +129,7 @@ be overridden by a model.
    ```text
    DATA_DIR=/data
    DEMO_MODE=true
-   PAYPAL_FORCE_MOCK=false
+   PAYPAL_FORCE_MOCK=true
    ALLOW_LIVE=false
    ```
 
@@ -162,7 +162,7 @@ Make sure `fly.toml` contains the volume mount and `DATA_DIR`:
 [env]
   DATA_DIR = "/data"
   DEMO_MODE = "true"
-  PAYPAL_FORCE_MOCK = "false"
+  PAYPAL_FORCE_MOCK = "true"
   ALLOW_LIVE = "false"
 ```
 
@@ -180,7 +180,7 @@ docker run -d --name mandatepay --restart unless-stopped \
   -e BASIC_AUTH_USER=judge \
   -e BASIC_AUTH_PASSWORD='<strong password>' \
   -e DEMO_MODE=true \
-  -e PAYPAL_FORCE_MOCK=false \
+  -e PAYPAL_FORCE_MOCK=true \
   -e ALLOW_LIVE=false \
   mandatepay
 ```
@@ -231,7 +231,7 @@ Without Docker, use the normal Python quickstart in the
 | `DATA_DIR` | `/data` | Persistent volume for SQLite and uploads |
 | `BASIC_AUTH_USER` | empty | Optional public-demo username |
 | `BASIC_AUTH_PASSWORD` | empty | Optional public-demo password; set both to enable auth |
-| `PAYPAL_FORCE_MOCK` | `false` | Safe: without credentials the app still uses the mock |
+| `PAYPAL_FORCE_MOCK` | `true` | Guarantees the deterministic mock; set `false` only to test sandbox |
 | `PAYPAL_ENV` | `sandbox` | Only relevant if you add credentials |
 | `PAYPAL_CLIENT_ID` / `PAYPAL_CLIENT_SECRET` | empty | Both required to leave mock mode |
 | `FREELANCER_EMAIL` | `freelancer@example.com` | Must be a Payouts-capable sandbox account for real sandbox payouts |
@@ -241,9 +241,9 @@ Without Docker, use the normal Python quickstart in the
 | `APPROVAL_TTL_MINUTES` | `30` | Approval decision window |
 | `APPROVAL_TOKEN_TTL_MINUTES` | `20` | Approved-token use window |
 
-`PAYPAL_FORCE_MOCK=false` does **not** move real money on its own. The app uses
-the mock until both PayPal credentials are present; with sandbox credentials it
-uses the real sandbox Orders/Payouts APIs.
+The default deployment is mock-only. To exercise the sandbox APIs, set
+`PAYPAL_FORCE_MOCK=false`, add both credentials, and keep `ALLOW_LIVE=false`.
+Real money is never implied by any of these settings.
 
 ---
 
@@ -316,7 +316,7 @@ and tamper endpoints.
 - [ ] Strong `BASIC_AUTH_PASSWORD`; do not commit `.env`.
 - [ ] `ALLOW_LIVE` unset/false.
 - [ ] `PAYPAL_ENV=sandbox` if credentials are configured.
-- [ ] `PAYPAL_FORCE_MOCK` unset/false, or `true` if you want to guarantee the mock.
+- [ ] `PAYPAL_FORCE_MOCK=true` for the default mock demo; set `false` only with sandbox credentials.
 - [ ] HTTPS only (automatic on Render/Railway/Fly/Caddy).
 - [ ] `PAYPAL_WEBHOOK_ID` set if the webhook endpoint is public; unverified events
       are recorded but never applied.

@@ -14,6 +14,9 @@
 > <https://mandatepay-byfz.onrender.com/> — no login, no credentials, no install.
 > Open it, click **Run full demo**, and approve the $60 hold when asked. The first
 > request can take 30–60 seconds while Render's free instance wakes up.
+>
+> The hosted build runs the **deterministic mock PayPal adapter** and **rules
+> engine** on purpose. The whole flow works without keys, and no real money moves.
 
 MandatePay is an AI procurement agent that can hire freelancers — but only inside
 a human-set **mandate**. The agent parses a plain-English instruction into a
@@ -142,6 +145,11 @@ credits tomorrow.
 | Verification | Real rules engine | Same rules + optional LLM |
 | Audit chain | Real SHA-256 chain | Same real chain |
 
+The hosted demo intentionally uses the left column: deterministic mock PayPal and
+the rules engine, with no credentials. That is the default build, not a broken
+integration. Adding sandbox credentials is optional and only changes *which*
+PayPal API the same code calls.
+
 The header always shows which engines are live: **PayPal mock** vs **PayPal
 sandbox**, and **Rules engine** vs the configured model. No key means no
 fictional AI claims.
@@ -201,7 +209,9 @@ Open <http://127.0.0.1:8000>. The app starts in mock mode and creates
 5. Click **Verify chain**, then optionally **Tamper test** to see the chain break.
 6. Click **Reset demo** to start over.
 
-No account, API key or internet connection is required.
+No account, API key or internet connection is required. The **PayPal mock**
+badge is expected: the demo intentionally runs the deterministic adapter so the
+full flow is reproducible offline.
 
 ### Verify the install
 
@@ -237,31 +247,29 @@ The repository ships a `Dockerfile` and a Render blueprint:
 
 1. Open <https://render.com/deploy?repo=https://github.com/nattypatty-beep/paypalhack>
    or create a **New → Blueprint** from the repo.
-2. Set `BASIC_AUTH_PASSWORD` when prompted. The username defaults to `judge`.
+2. Click **Apply**. No secrets are required for the default build.
 3. Wait for the Docker build and open the generated HTTPS URL.
-4. Log in and click **Run full demo**.
+4. Click **Run full demo**.
 
-`render.yaml` enables demo mode, forces the mock PayPal adapter, sets
-`DATA_DIR=/data` and gates the site behind Basic auth. Render's free plan has an
-ephemeral filesystem, so the demo resets when the service restarts; add the
-commented disk block (and a paid instance) to keep state.
+`render.yaml` enables demo mode, forces the deterministic mock PayPal adapter,
+sets `DATA_DIR=/data` and leaves the demo public. To make an instance private,
+uncomment the `BASIC_AUTH_*` block in `render.yaml` and set a password. Render's
+free plan has an ephemeral filesystem, so the demo resets when the service
+restarts; add the commented disk block (and a paid instance) to keep state.
 
 Any Docker host works:
 
 ```bash
 docker build -t mandatepay .
-docker run -d -p 8000:8000 -v mandatepay_data:/data \
-  -e BASIC_AUTH_USER=judge -e BASIC_AUTH_PASSWORD='<strong password>' \
-  mandatepay
+docker run -d -p 8000:8000 -v mandatepay_data:/data mandatepay
 ```
 
-Full instructions, Railway/Fly/VPS examples, SSE proxy notes, webhook setup and
-a security checklist: [docs/DEPLOY.md](docs/DEPLOY.md).
+Full instructions, Railway/Fly/VPS examples, optional Basic auth, sandbox
+credentials, SSE proxy notes, webhook setup and a security checklist:
+[docs/DEPLOY.md](docs/DEPLOY.md).
 
-> Public deployments are safe with `PAYPAL_FORCE_MOCK=false`: the app still uses
-> the mock until both sandbox credentials are set. `ALLOW_LIVE` must stay
-> unset/false. Basic auth is one shared login, not multi-user authorization; read
-> [SECURITY.md](SECURITY.md) first.
+> The default deployment never calls PayPal: `PAYPAL_FORCE_MOCK=true` guarantees
+> the mock adapter. Sandbox mode is optional. `ALLOW_LIVE` must stay unset/false.
 
 ---
 
@@ -483,8 +491,9 @@ The grid is the product's money trail, not decoration:
 
 ## API
 
-Interactive OpenAPI docs: <http://127.0.0.1:8000/docs>. The UI uses the same
-public API that a judge or an agent would.
+Interactive OpenAPI docs: <https://mandatepay-byfz.onrender.com/docs> (hosted) or
+<http://127.0.0.1:8000/docs> (local). The UI uses the same public API that a judge
+or an agent would.
 
 | Method | Path | Purpose |
 | --- | --- | --- |
@@ -605,7 +614,7 @@ tests/           53-test pytest suite
 docs/            Architecture, PayPal, deployment, demo script, Devpost copy, screenshot
 scripts/         Smoke test
 Dockerfile       Non-root production image with a /data volume
-render.yaml      Render blueprint: demo mode, mock PayPal, Basic auth
+render.yaml      Render blueprint: demo mode, forced mock PayPal, public demo
 .github/         CI (tests, smoke, Docker build), Dependabot, issue and PR templates
 ```
 
@@ -790,8 +799,9 @@ The full submission copy is in [docs/DEVPOST.md](docs/DEVPOST.md).
 
 ## Safety and limitations
 
-- Sandbox by default. Live PayPal is blocked behind `ALLOW_LIVE=1` **and**
-  credentials.
+- **Mock by default.** The demo never calls PayPal unless you remove
+  `PAYPAL_FORCE_MOCK` and add sandbox credentials. Live PayPal additionally
+  requires real credentials **and** `ALLOW_LIVE=1`.
 - The mock adapter is deterministic and must never be confused with real money;
   the UI labels it clearly.
 - The audit chain proves internal consistency, not external notarization. A
@@ -799,9 +809,10 @@ The full submission copy is in [docs/DEVPOST.md](docs/DEVPOST.md).
 - Uploaded files are stored locally and served with a restrictive content policy.
   A production deployment needs malware scanning, object storage and per-tenant
   isolation.
-- HTTP Basic auth is optional and off by default. It is a single shared login,
-  not per-user authorization. Enable it before exposing the demo publicly, and
-  add real identity/tenant controls before handling anyone else's money.
+- HTTP Basic auth is optional and off by default. The hosted demo is intentionally
+  public. If you need a private instance, set both `BASIC_AUTH_USER` and
+  `BASIC_AUTH_PASSWORD`; it is a single shared login, not per-user authorization.
+  Add real identity/tenant controls before handling anyone else's money.
 - There is no refund, dispute or chargeback workflow. Cancelling voids the
   remaining authorization; it does not refund captured money.
 - This is a hackathon prototype, not a licensed escrow or money-transmission
