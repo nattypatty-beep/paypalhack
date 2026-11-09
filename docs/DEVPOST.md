@@ -1,7 +1,7 @@
 # Devpost submission copy
 
-Copy the sections below into Devpost. Replace `YOUR_ORG` and the video URL before
-publishing.
+Copy the sections below into Devpost. Replace `YOUR_VIDEO_ID` with the published
+video before submitting.
 
 ---
 
@@ -184,11 +184,11 @@ inspection.
 
 ## Try it out
 
-Repository: `https://github.com/YOUR_ORG/mandatepay`
+Repository: <https://github.com/nattypatty-beep/paypalhack>
 
 ```bash
-git clone https://github.com/YOUR_ORG/mandatepay.git
-cd mandatepay
+git clone https://github.com/nattypatty-beep/paypalhack.git
+cd paypalhack
 python -m venv .venv
 # Windows: .venv\Scripts\activate
 source .venv/bin/activate

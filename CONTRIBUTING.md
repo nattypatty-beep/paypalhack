@@ -14,8 +14,8 @@ and to license your contributions under the [MIT License](LICENSE).
 **Requirements:** Python 3.11+ (tested on 3.13). No Node, no database server.
 
 ```bash
-git clone https://github.com/YOUR_ORG/mandatepay.git
-cd mandatepay
+git clone https://github.com/nattypatty-beep/paypalhack.git
+cd paypalhack
 python -m venv .venv
 
 # Windows PowerShell:
